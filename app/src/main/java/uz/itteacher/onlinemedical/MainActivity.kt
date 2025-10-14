@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import uz.itteacher.onlinemedical.screens.appointments.AppointmentsScreen
 import uz.itteacher.onlinemedical.ui.theme.OnlineMedicalTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +20,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OnlineMedicalTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppointmentsScreen()
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     OnlineMedicalTheme {
-        Greeting("Android")
+        AppointmentsScreen()
     }
 }
