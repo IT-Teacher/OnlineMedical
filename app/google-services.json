@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "819113410309",
+    "firebase_url": "https://online-medical-b195c-default-rtdb.firebaseio.com",
+    "project_id": "online-medical-b195c",
+    "storage_bucket": "online-medical-b195c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819113410309:android:01f99f0b51194bbd91c16c",
+        "android_client_info": {
+          "package_name": "uz.itteacher.onlinemedical"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo3bA3rTZDK3pZ8Wj-bdk2kKtVVGG49Vg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
