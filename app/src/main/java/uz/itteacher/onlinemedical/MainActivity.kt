@@ -1,5 +1,6 @@
 package uz.itteacher.onlinemedical
 
+import CancelAppointmentScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,13 +15,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import uz.itteacher.onlinemedical.screens.appointments.AppointmentsScreen
 import uz.itteacher.onlinemedical.ui.theme.OnlineMedicalTheme
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             OnlineMedicalTheme {
-                AppointmentsScreen()
+                CancelAppointmentScreen()
             }
         }
     }
@@ -30,6 +32,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     OnlineMedicalTheme {
-        AppointmentsScreen()
+        CancelAppointmentScreen()
     }
 }
