@@ -45,7 +45,13 @@ fun AppointmentsScreen() {
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(filteredAppointments) { appointment ->
-                    AppointmentCard(appointment)
+                    if (selectedTab == 1) {
+                        CompletedAppointmentCard(appointment)
+                    } else if (selectedTab == 0) {
+                        AppointmentCard(appointment)
+                    } else {
+                        CanceledAppointmentCard(appointment)
+                    }
                 }
             }
         }
