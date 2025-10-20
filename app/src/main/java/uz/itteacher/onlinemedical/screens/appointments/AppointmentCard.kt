@@ -125,7 +125,6 @@ fun AppointmentCard(appointment: Appointment) {
         }
     }
 }
-
 @Composable
 fun CompletedAppointmentCard(appointment: Appointment) {
     Card(
@@ -166,16 +165,16 @@ fun CompletedAppointmentCard(appointment: Appointment) {
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Video Call     -     ",
+                            text = "Messaging     -     ",
                             color = Color.DarkGray,
                             fontSize = 14.sp,
                             maxLines = 1
                         )
                         Button(
-                            border = BorderStroke(1.dp, Color(0xFF71E73C)),
+                            border = BorderStroke(1.dp, Color(0xFF37FF00)),
                             onClick = {},
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9CFF7F).copy(alpha = 0f), contentColor = Color(
-                                0xFF36FF00
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF37FF00).copy(alpha = 0f), contentColor = Color(
+                                0xFF37FF00
                             )
                             ),
                             shape = RoundedCornerShape(12.dp),
@@ -235,7 +234,7 @@ fun CompletedAppointmentCard(appointment: Appointment) {
     }
 }
 @Composable
-fun CancelledAppointmentCard(appointment: Appointment) {
+fun CanceledAppointmentCard(appointment: Appointment) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -274,7 +273,7 @@ fun CancelledAppointmentCard(appointment: Appointment) {
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Video Call     -     ",
+                            text = "Messaging     -     ",
                             color = Color.DarkGray,
                             fontSize = 14.sp,
                             maxLines = 1

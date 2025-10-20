@@ -50,13 +50,14 @@ fun AppointmentsScreen() {
                     } else if (selectedTab == 0) {
                         AppointmentCard(appointment)
                     } else {
-                        CancelledAppointmentCard(appointment)
+                        CanceledAppointmentCard(appointment)
                     }
                 }
             }
         }
     }
 }
+
 @Composable
 fun EmptyState() {
     Box(
