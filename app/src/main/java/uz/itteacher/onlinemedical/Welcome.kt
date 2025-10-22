@@ -221,5 +221,3 @@ fun OnboardingSteps(onboardingList: List<WelcomeData>, onFinish: () -> Unit) {
 
 
 
-
-
