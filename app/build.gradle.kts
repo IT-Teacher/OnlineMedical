@@ -41,7 +41,16 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+// Firebase (BoM o‘rniga to‘g‘ridan-to‘g‘ri)
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+// Coroutines
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
