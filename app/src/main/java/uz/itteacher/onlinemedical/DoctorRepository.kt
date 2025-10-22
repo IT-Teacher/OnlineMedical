@@ -13,7 +13,7 @@ class DoctorRepository {
 
     private val dbRef = FirebaseDatabase.getInstance().getReference("doctors")
 
-    // suspend qilib, Firebase snapshotni kutadigan oddiy funksiya
+
     suspend fun getDoctors(): List<Doctor> = suspendCoroutine { cont ->
         dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

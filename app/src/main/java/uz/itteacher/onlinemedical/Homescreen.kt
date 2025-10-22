@@ -163,7 +163,6 @@ fun HomeScreen(
 @Composable
 fun SearchBar(
     value: String,
-
     onClick: () -> Unit
 ) {
     Box(
@@ -193,7 +192,28 @@ fun SearchBar(
 
 
 
-
+@Composable
+fun SpecialityItem(title: String, iconRes: Int, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = Color(0xFFEFF4FF),
+            modifier = Modifier.size(60.dp)
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = title,
+                tint = Color(0xFF3371FF),
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(title, fontSize = 13.sp, color = Color.Black)
+    }
+}
 @Composable
 fun DoctorSpecialityRow(onSpecialityClick: (String) -> Unit) {
     Row(
@@ -222,42 +242,6 @@ fun DoctorSpecialityRow(onSpecialityClick: (String) -> Unit) {
 
 
 
-@Composable
-fun MainApp() {
-    val navController = rememberNavController()
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route ?: "home"
-
-    Scaffold(
-        bottomBar = {
-            if (currentRoute in listOf("home", "appointments", "history", "articles", "profile")) {
-                BottomNavigationBar(navController, currentRoute)
-            }
-        }
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = "home",
-            modifier = Modifier.padding(padding)
-        ) {
-            composable("home") {
-                HomeScreen(
-                    viewModel = viewModel(),
-                    onSearchClick = { navController.navigate("search") }
-                )
-            }
-            composable("search") {
-                SearchScreen(
-                    viewModel = viewModel(),
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable("appointments") { Text("Appointments Screen", color = Color.Black) }
-            composable("history") { Text("History Screen", color = Color.Black) }
-            composable("articles") { Text("Articles Screen", color = Color.Black) }
-            composable("profile") { Text("Profile Screen", color = Color.Black) }
-        }
-    }
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -391,54 +375,6 @@ fun SearchScreen(
     }
 }
 
-@Composable
-fun DoctorCategoryFilter(selected: String, onSelectedChange: (String) -> Unit) {
-    val categories = listOf(
-        "All", "General", "Dentist", "Ophthalm.", "Nutrition", "Neurology", "Pediatric", "Radiology"
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        categories.forEach { category ->
-            FilterChip(
-                selected = selected == category,
-                onClick = { onSelectedChange(category) },
-                label = { Text(category, fontSize = 12.sp) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF3371FF),
-                    selectedLabelColor = Color.White,
-                    containerColor = Color(0xFFEFF4FF)
-                )
-            )
-        }
-    }
-}
-@Composable
-fun SpecialityItem(title: String, iconRes: Int, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = Color(0xFFEFF4FF),
-            modifier = Modifier.size(60.dp)
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = title,
-                tint = Color(0xFF3371FF),
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        Spacer(Modifier.height(6.dp))
-        Text(title, fontSize = 13.sp, color = Color.Black)
-    }
-}
 
 
 
@@ -553,4 +489,41 @@ fun DoctorCard(doctor: Doctor) {
         }
     }
 }
+@Composable
+fun MainApp() {
+    val navController = rememberNavController()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route ?: "home"
+
+    Scaffold(
+        bottomBar = {
+            if (currentRoute in listOf("home", "appointments", "history", "articles", "profile")) {
+                BottomNavigationBar(navController, currentRoute)
+            }
+        }
+    ) { padding ->
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(padding)
+        ) {
+            composable("home") {
+                HomeScreen(
+                    viewModel = viewModel(),
+                    onSearchClick = { navController.navigate("search") }
+                )
+            }
+            composable("search") {
+                SearchScreen(
+                    viewModel = viewModel(),
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("appointments") { Text("Appointments Screen", color = Color.Black) }
+            composable("history") { Text("History Screen", color = Color.Black) }
+            composable("articles") { Text("Articles Screen", color = Color.Black) }
+            composable("profile") { Text("Profile Screen", color = Color.Black) }
+        }
+    }
+}
+
 

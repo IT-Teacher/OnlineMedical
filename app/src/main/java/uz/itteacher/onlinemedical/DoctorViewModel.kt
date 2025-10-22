@@ -42,6 +42,6 @@ class DoctorViewModel(
         }
     }
 
-    // agar qo'lda refresh kerak bo'lsa
+
     fun refresh() = fetchDoctors()
 }
