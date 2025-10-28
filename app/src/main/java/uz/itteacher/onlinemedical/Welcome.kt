@@ -30,7 +30,6 @@ fun WelcomeScreen() {
     var highlightData by remember { mutableStateOf(WelcomeData()) }
     var onboardingList by remember { mutableStateOf<List<WelcomeData>>(emptyList()) }
 
-    // Splash -> load Firebase -> show highlight
     LaunchedEffect(Unit) {
         delay(3000)
         showSplash = false
@@ -62,9 +61,7 @@ fun WelcomeScreen() {
         contentAlignment = Alignment.Center
     ) {
         when {
-            // SHOW RegisterScreen when flag true
             showRegister -> {
-                // important: pass lambda that sets showRegister = false
                 RegisterScreen(onBack = { showRegister = false })
             }
 

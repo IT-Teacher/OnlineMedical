@@ -55,7 +55,6 @@ fun FillProfileScreen(
     val db = FirebaseDatabase.getInstance().getReference("users")
     val scope = rememberCoroutineScope()
 
-    // Kalendar ochish
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
@@ -73,7 +72,7 @@ fun FillProfileScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Header
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -90,7 +89,7 @@ fun FillProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Avatar
+
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -108,7 +107,6 @@ fun FillProfileScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Full Name
         OutlinedTextField(
             value = fullName,
             onValueChange = { fullName = it; fullNameError = false },
@@ -119,7 +117,6 @@ fun FillProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Nickname
         OutlinedTextField(
             value = nickname,
             onValueChange = { nickname = it; nicknameError = false },
@@ -130,7 +127,7 @@ fun FillProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Date of Birth
+
         OutlinedTextField(
             value = dateOfBirth,
             onValueChange = { },
@@ -149,7 +146,6 @@ fun FillProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it; emailError = false },
@@ -162,7 +158,7 @@ fun FillProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Gender dropdown
+
         var expanded by remember { mutableStateOf(false) }
 
         ExposedDropdownMenuBox(
@@ -219,7 +215,6 @@ fun FillProfileScreen(
                     )
                     db.push().child("profile").setValue(newProfile)
 
-                    // ✅ Dialogni ko‘rsatish
                     showDialog = true
 
                     // 3 sek kutib HomeScreen ga o‘tish
@@ -249,7 +244,6 @@ fun FillProfileScreen(
         }
     }
 
-    // ✅ Dialog chiqadigan joy
     if (showDialog) {
         Dialog(onDismissRequest = { }) {
             Box(
