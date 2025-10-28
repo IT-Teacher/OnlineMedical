@@ -23,17 +23,21 @@ import com.google.firebase.database.FirebaseDatabase
 
 @Composable
 fun RegisterScreen(onBack: () -> Unit = {}) {
-    var currentScreen by remember { mutableStateOf("register") } // bosh ekran
+    var currentScreen by remember { mutableStateOf("register") }
 
     when (currentScreen) {
         "register" -> RegisterContent(onSignUpClick = { currentScreen = "signup" })
         "signup" -> SignUpScreen(
             onBack = { currentScreen = "register" },
-            onLoginClick = { currentScreen = "login" }
+            onLoginClick = { currentScreen = "login" },
+            onFillProfile = { currentScreen = "fillProfile" }
         )
         "login" -> LoginScreen(
             onBack = { currentScreen = "signup" },
             onSignUpClick = { currentScreen = "signup" }
+        )
+        "fillProfile" -> FillProfileScreen(
+            onBack = { currentScreen = "signup" }
         )
     }
 }
@@ -59,23 +63,17 @@ fun RegisterContent(onSignUpClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* optional */ }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-            }
+
         }
 
         if (imageUrl.isNotEmpty()) {
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
                 contentDescription = "Welcome Illustration",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
+                modifier = Modifier.fillMaxWidth().height(300.dp)
             )
         }
 
@@ -87,9 +85,7 @@ fun RegisterContent(onSignUpClick: () -> Unit) {
 
         Button(
             onClick = onSignUpClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
+            modifier = Modifier.fillMaxWidth().height(55.dp),
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF))
         ) {
@@ -99,7 +95,11 @@ fun RegisterContent(onSignUpClick: () -> Unit) {
 }
 
 @Composable
-fun SignUpScreen(onBack: () -> Unit = {}, onLoginClick: () -> Unit = {}) {
+fun SignUpScreen(
+    onBack: () -> Unit = {},
+    onLoginClick: () -> Unit = {},
+    onFillProfile: () -> Unit = {}
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var emailValid by remember { mutableStateOf<Boolean?>(null) }
@@ -109,7 +109,6 @@ fun SignUpScreen(onBack: () -> Unit = {}, onLoginClick: () -> Unit = {}) {
     val db = FirebaseDatabase.getInstance()
     val usersRef = db.getReference("users")
 
-    // Email mavjud emasligini tekshirish
     LaunchedEffect(email) {
         if (email.isNotEmpty()) {
             usersRef.get().addOnSuccessListener { snap ->
@@ -126,22 +125,17 @@ fun SignUpScreen(onBack: () -> Unit = {}, onLoginClick: () -> Unit = {}) {
         } else emailValid = null
     }
 
-    // Parol to‘ldirilganini tekshirish
     LaunchedEffect(password) {
         passwordValid = password.isNotEmpty()
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
@@ -152,28 +146,16 @@ fun SignUpScreen(onBack: () -> Unit = {}, onLoginClick: () -> Unit = {}) {
         Image(
             painter = painterResource(id = R.drawable.images),
             contentDescription = "Logo",
-            modifier = Modifier
-                .size(120.dp)
-                .padding(top = 10.dp)
+            modifier = Modifier.size(120.dp).padding(top = 10.dp)
         )
 
-        Text(
-            text = "Create New Account",
-            fontSize = 24.sp,
-            color = Color.Black
-        )
+        Text(text = "Create New Account", fontSize = 24.sp, color = Color.Black)
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Email,
-                    contentDescription = "Email",
-                    tint = if (email.isNotEmpty()) Color.Black else Color.Gray
-                )
-            },
+            leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email", tint = Color.Gray) },
             modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(20.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -195,9 +177,7 @@ fun SignUpScreen(onBack: () -> Unit = {}, onLoginClick: () -> Unit = {}) {
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
-            leadingIcon = {
-                Icon(imageVector = Icons.Default.Lock, contentDescription = "Password Icon", tint = Color.Gray)
-            },
+            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Password Icon", tint = Color.Gray) },
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
@@ -232,6 +212,7 @@ fun SignUpScreen(onBack: () -> Unit = {}, onLoginClick: () -> Unit = {}) {
                     val newUser = usersRef.push()
                     newUser.child("email").setValue(email)
                     newUser.child("password").setValue(password)
+                        .addOnSuccessListener { onFillProfile() }
                 }
             },
             modifier = Modifier.fillMaxWidth().height(55.dp),
@@ -267,55 +248,15 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var emailValid by remember { mutableStateOf<Boolean?>(null) }
-    var passwordValid by remember { mutableStateOf<Boolean?>(null) }
     var passwordVisible by remember { mutableStateOf(false) }
-
-    val db = FirebaseDatabase.getInstance()
-    val usersRef = db.getReference("users")
-
-    // Email tekshirish
-    LaunchedEffect(email) {
-        if (email.isNotEmpty()) {
-            usersRef.get().addOnSuccessListener { snap ->
-                val users = snap.children
-                var match = false
-                for (user in users) {
-                    val userEmail = user.child("email").value?.toString() ?: ""
-                    if (userEmail.equals(email, ignoreCase = true)) {
-                        match = true
-                        break
-                    }
-                }
-                emailValid = match
-            }
-        } else emailValid = null
-    }
-
-    fun checkPassword() {
-        if (emailValid == true && password.isNotEmpty()) {
-            usersRef.get().addOnSuccessListener { snap ->
-                for (user in snap.children) {
-                    val userEmail = user.child("email").value?.toString() ?: ""
-                    val userPassword = user.child("password").value?.toString() ?: ""
-                    if (userEmail.equals(email, ignoreCase = true)) {
-                        passwordValid = (password == userPassword)
-                        break
-                    }
-                }
-            }
-        } else passwordValid = null
-    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
             }
@@ -341,7 +282,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it; checkPassword() },
+            onValueChange = { password = it },
             label = { Text("Password") },
             leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Password Icon", tint = Color.Gray) },
             trailingIcon = {
@@ -359,7 +300,7 @@ fun LoginScreen(
         )
 
         Button(
-            onClick = { if (emailValid == true && passwordValid == true) onLoginSuccess() },
+            onClick = { onLoginSuccess() },
             modifier = Modifier.fillMaxWidth().height(55.dp),
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF))

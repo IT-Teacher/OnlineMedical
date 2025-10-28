@@ -5,13 +5,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import uz.itteacher.onlinemedical.WelcomeScreen // ✅ shu qatorda
+import uz.itteacher.onlinemedical.FillProfileScreen
+import uz.itteacher.onlinemedical.RegisterScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
-//            FillProfileScreen()
+           FillProfileScreen()
+//            RegisterScreen()
+//            WelcomeScreen()
         }
     }
 }
