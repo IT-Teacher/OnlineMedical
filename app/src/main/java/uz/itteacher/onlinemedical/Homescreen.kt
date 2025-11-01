@@ -48,13 +48,13 @@ fun HomeScreen(
     viewModel: DoctorViewModel = viewModel(),
     favoriteViewModel: FavoriteViewModel,
     onSearchClick: () -> Unit = {},
-    onFavoriteClick: () -> Unit // 🔹 FavoriteDoctorScreen’ga o‘tish uchun
+    onFavoriteClick: () -> Unit
 ) {
     val doctors by viewModel.doctors.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState() // 🔹 Favorite doktorlar ID’lari
+    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedSpeciality by remember { mutableStateOf("All") }
@@ -77,7 +77,7 @@ fun HomeScreen(
                         )
                     }
 
-                    // 🔹 Favorite icon — bosilganda FavoriteDoctorScreen’ga o‘tadi
+
                     IconButton(onClick = onFavoriteClick) {
                         Icon(
                             painter = painterResource(R.drawable.favoutite),
@@ -107,13 +107,13 @@ fun HomeScreen(
                 else -> {
                     LazyColumn(contentPadding = PaddingValues(bottom = 80.dp)) {
                         item {
-                            // 🔹 Search Bar
+
                             SearchBar(
                                 value = searchQuery,
                                 onClick = onSearchClick
                             )
 
-                            // 🔹 Banner
+
                             Image(
                                 painter = painterResource(R.drawable.banner),
                                 contentDescription = null,
@@ -148,7 +148,7 @@ fun HomeScreen(
                             )
                         }
 
-                        // 🔹 Filterlangan doctorlar
+
                         val filteredDoctors = doctors.filter { doctor ->
                             val matchesSearch = doctor.name.contains(searchQuery, true) ||
                                     doctor.speciality.contains(searchQuery, true)
@@ -157,7 +157,7 @@ fun HomeScreen(
                             matchesSearch && matchesSpeciality
                         }
 
-                        // 🔹 DoctorCard — yurakcha bilan
+
                         items(filteredDoctors) { doctor ->
                             DoctorCardWithFavorite(
                                 doctor = doctor,
@@ -331,7 +331,7 @@ fun SearchScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
 
-    // 🔹 Filterlangan doctorlar
+
     val filteredDoctors = doctors.filter { doctor ->
         (selectedCategory == "All" || doctor.speciality.contains(selectedCategory, true)) &&
                 (doctor.name.contains(searchQuery, true) || doctor.speciality.contains(searchQuery, true))
@@ -400,7 +400,7 @@ fun SearchScreen(
                 .background(Color(0xFFF8F9FD))
                 .padding(padding)
         ) {
-            // 🔹 Kategoriyalar (FilterChip)
+
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -431,7 +431,7 @@ fun SearchScreen(
                 }
             }
 
-            // 🔹 Doctorlar ro‘yxati
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -571,7 +571,7 @@ fun MainApp(
                 )
             }
 
-            // 🔍 Search screen
+
             composable("search") {
                 val doctorViewModel: DoctorViewModel = viewModel()
 
@@ -582,7 +582,7 @@ fun MainApp(
                 )
             }
 
-            // ❤️ Favorite Doctor screen
+
             composable("favorites") {
                 FavoriteDoctorScreen(
                     viewModel = favoriteViewModel,
@@ -590,22 +590,22 @@ fun MainApp(
                 )
             }
 
-            // 📅 Appointments
+
             composable("appointments") {
                 Text("Appointments Screen", color = Color.Black)
             }
 
-            // 📖 History
+
             composable("history") {
                 Text("History Screen", color = Color.Black)
             }
 
-            // 📰 Articles
+
             composable("articles") {
                 Text("Articles Screen", color = Color.Black)
             }
 
-            // 👤 Profile
+
             composable("profile") {
                 Text("Profile Screen", color = Color.Black)
             }

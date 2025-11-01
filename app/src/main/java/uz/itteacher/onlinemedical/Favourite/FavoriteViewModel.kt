@@ -44,7 +44,7 @@ class FavoriteViewModel : ViewModel() {
                     val doctor = doc.getValue(Doctor::class.java)
                     val key = doc.key ?: ""
                     if (doctor != null && ids.contains(key)) {
-                        // doctor modelimizga id va isFavorite qo'shamiz
+
                         doctors.add(doctor.copy(id = key, isFavorite = true))
                     }
                 }

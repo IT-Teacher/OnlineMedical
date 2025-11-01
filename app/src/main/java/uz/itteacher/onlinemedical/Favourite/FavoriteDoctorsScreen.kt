@@ -47,7 +47,7 @@ fun FavoriteDoctorScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
 
-    // 🔹 Filterlangan favorite doctorlar
+
     val filteredFavorites = favorites.filter { doctor ->
         (selectedCategory == "All" || doctor.speciality.contains(selectedCategory, true)) &&
                 (doctor.name.contains(searchQuery, true) || doctor.speciality.contains(searchQuery, true))
@@ -141,7 +141,6 @@ fun FavoriteDoctorScreen(
                 }
             }
 
-            // 🔹 Favorite doctorlar ro‘yxati
             if (filteredFavorites.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -166,7 +165,6 @@ fun FavoriteDoctorScreen(
                 }
             }
 
-            // 🔹 Remove dialog
             dialogDoctor?.let { doctor ->
                 RemoveFavoriteDialog(
                     doctor = doctor,
@@ -191,7 +189,7 @@ fun DoctorItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* keyincha detail sahifaga */ },
+            .clickable { },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
@@ -201,7 +199,7 @@ fun DoctorItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 🔹 Rasm
+
             val painter = rememberAsyncImagePainter(
                 model = doctor.imageUrl
             )
@@ -218,14 +216,13 @@ fun DoctorItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // 🔹 Ma'lumotlar
             Column(modifier = Modifier.weight(1f)) {
                 Text(doctor.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text(doctor.speciality, color = Color.Gray)
                 Text(doctor.hospital, color = Color.Gray)
             }
 
-            // 🔹 Like tugmasi (❤️)
+
             IconButton(onClick = onLikeClick) {
                 Icon(
                     imageVector = if (doctor.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
@@ -234,7 +231,7 @@ fun DoctorItem(
                 )
             }
 
-            // 🔹 Delete tugmasi
+
             IconButton(onClick = onRemove) {
                 Icon(
                     imageVector = Icons.Default.Delete,

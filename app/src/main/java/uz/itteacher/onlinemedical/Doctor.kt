@@ -1,7 +1,7 @@
 package uz.itteacher.onlinemedical
 
 data class Doctor(
-    val id: String = "",                // 🔹 doc key
+    val id: String = "",
     val name: String = "",
     val about: String = "",
     val hospital: String = "",
@@ -11,5 +11,5 @@ data class Doctor(
     val reviews: Int = 0,
     val speciality: String = "",
     val workingTime: String = "",
-    val isFavorite: Boolean = false     // 🔹 default false
+    val isFavorite: Boolean = false
 )

@@ -22,7 +22,7 @@ class DoctorRepository {
                     for (child in snapshot.children) {
                         val doctor = child.getValue(Doctor::class.java)
                         if (doctor != null) {
-                            // child.key bilan id ni qo'shamiz
+
                             list.add(doctor.copy(id = child.key ?: ""))
                         }
                     }
