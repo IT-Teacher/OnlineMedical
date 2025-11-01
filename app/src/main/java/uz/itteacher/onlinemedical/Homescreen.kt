@@ -11,6 +11,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,18 +36,25 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import uz.itteacher.onlinemedical.favourite.ui.FavoriteDoctorScreen
+import uz.itteacher.onlinemedical.favourite.viewmodel.FavoriteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 
 
 @Composable
 fun HomeScreen(
     viewModel: DoctorViewModel = viewModel(),
-    onSearchClick: () -> Unit = {}
+    favoriteViewModel: FavoriteViewModel,
+    onSearchClick: () -> Unit = {},
+    onFavoriteClick: () -> Unit // 🔹 FavoriteDoctorScreen’ga o‘tish uchun
 ) {
     val doctors by viewModel.doctors.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+
+    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState() // 🔹 Favorite doktorlar ID’lari
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedSpeciality by remember { mutableStateOf("All") }
@@ -67,7 +76,9 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
-                    IconButton(onClick = {}) {
+
+                    // 🔹 Favorite icon — bosilganda FavoriteDoctorScreen’ga o‘tadi
+                    IconButton(onClick = onFavoriteClick) {
                         Icon(
                             painter = painterResource(R.drawable.favoutite),
                             modifier = Modifier.size(22.dp),
@@ -137,7 +148,7 @@ fun HomeScreen(
                             )
                         }
 
-                        // 🔹 Search yoki Speciality bo‘yicha filter
+                        // 🔹 Filterlangan doctorlar
                         val filteredDoctors = doctors.filter { doctor ->
                             val matchesSearch = doctor.name.contains(searchQuery, true) ||
                                     doctor.speciality.contains(searchQuery, true)
@@ -146,8 +157,15 @@ fun HomeScreen(
                             matchesSearch && matchesSpeciality
                         }
 
+                        // 🔹 DoctorCard — yurakcha bilan
                         items(filteredDoctors) { doctor ->
-                            DoctorCard(doctor)
+                            DoctorCardWithFavorite(
+                                doctor = doctor,
+                                isFavorite = favoriteIds.contains(doctor.id),
+                                onFavoriteToggle = {
+                                    favoriteViewModel.toggleFavorite(doctor)
+                                }
+                            )
                         }
                     }
                 }
@@ -156,6 +174,62 @@ fun HomeScreen(
     }
 }
 
+
+@Composable
+fun DoctorCardWithFavorite(
+    doctor: Doctor,
+    isFavorite: Boolean,
+    onFavoriteToggle: () -> Unit
+) {
+    val ctx = LocalContext.current
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Row(
+            Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(ctx)
+                    .data(doctor.imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = doctor.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+            )
+
+            Spacer(Modifier.width(12.dp))
+
+            Column(Modifier.weight(1f)) {
+                Text(doctor.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(doctor.speciality, color = MaterialTheme.colorScheme.primary)
+                Text("🏥 ${doctor.hospital}", fontSize = 13.sp)
+                Text("📍 ${doctor.location}", fontSize = 13.sp)
+                Text("⭐ ${doctor.rating} (${doctor.reviews} reviews)", fontSize = 13.sp)
+            }
+
+            IconButton(onClick = onFavoriteToggle) {
+                Icon(
+                    painter = painterResource(
+                        if (isFavorite) R.drawable.favoutite else R.drawable.favoutite
+                    ),
+                    contentDescription = "Favorite",
+                    tint = if (isFavorite) Color.Red else Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
+}
 
 
 
@@ -207,7 +281,7 @@ fun SpecialityItem(title: String, iconRes: Int, onClick: () -> Unit) {
                 painter = painterResource(iconRes),
                 contentDescription = title,
                 tint = Color(0xFF3371FF),
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(20.dp)
             )
         }
         Spacer(Modifier.height(6.dp))
@@ -222,8 +296,8 @@ fun DoctorSpecialityRow(onSpecialityClick: (String) -> Unit) {
     ) {
         SpecialityItem("General", R.drawable.group) { onSpecialityClick("General") }
         SpecialityItem("Dentist", R.drawable.tooth) { onSpecialityClick("Dentist") }
-        SpecialityItem("Nutrition", R.drawable.fruit) { onSpecialityClick("Nutrition") }
-        SpecialityItem("Ophthalm.", R.drawable.eye) { onSpecialityClick("Ophthalm.") }
+        SpecialityItem("Nutritionist", R.drawable.fruit) { onSpecialityClick("Nutritionist") }
+        SpecialityItem("Ophthalm", R.drawable.eye) { onSpecialityClick("Ophthalm") }
     }
 
     Spacer(modifier = Modifier.height(20.dp))
@@ -233,7 +307,7 @@ fun DoctorSpecialityRow(onSpecialityClick: (String) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         SpecialityItem("Neurology", R.drawable.brain) { onSpecialityClick("Neurology") }
-        SpecialityItem("Pediatric", R.drawable.girl) { onSpecialityClick("Pediatric") }
+        SpecialityItem("Pediatrician", R.drawable.girl) { onSpecialityClick("Pediatrician") }
         SpecialityItem("Radiology", R.drawable.sklet) { onSpecialityClick("Radiology") }
         SpecialityItem("All", R.drawable.more) { onSpecialityClick("All") }
     }
@@ -248,12 +322,16 @@ fun DoctorSpecialityRow(onSpecialityClick: (String) -> Unit) {
 @Composable
 fun SearchScreen(
     viewModel: DoctorViewModel = viewModel(),
+    favoriteViewModel: FavoriteViewModel,
     onBack: () -> Unit
 ) {
     val doctors by viewModel.doctors.collectAsState()
+    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
+
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
 
+    // 🔹 Filterlangan doctorlar
     val filteredDoctors = doctors.filter { doctor ->
         (selectedCategory == "All" || doctor.speciality.contains(selectedCategory, true)) &&
                 (doctor.name.contains(searchQuery, true) || doctor.speciality.contains(searchQuery, true))
@@ -271,16 +349,21 @@ fun SearchScreen(
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
-                            placeholder = { Text("Search doctors...", color = Color.Gray) },
+                            placeholder = {
+                                Text(
+                                    "Search doctors...",
+                                    color = Color.Gray
+                                )
+                            },
                             singleLine = true,
                             shape = CircleShape,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(46.dp)
+                                .height(56.dp)
                                 .shadow(4.dp, CircleShape),
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.search,),
+                                    painter = painterResource(R.drawable.search),
                                     contentDescription = null,
                                     tint = Color.Gray,
                                     modifier = Modifier.size(20.dp)
@@ -317,13 +400,13 @@ fun SearchScreen(
                 .background(Color(0xFFF8F9FD))
                 .padding(padding)
         ) {
-            // 🔹 Gorizontal Filter bo‘lim
+            // 🔹 Kategoriyalar (FilterChip)
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 val categories = listOf(
-                    "All", "General", "Dentist", "Ophthalm.", "Nutrition",
+                    "All", "General", "Dentist", "Ophthalm", "Nutrition",
                     "Neurology", "Pediatric", "Radiology"
                 )
                 items(categories) { category ->
@@ -367,7 +450,13 @@ fun SearchScreen(
                     }
                 } else {
                     items(filteredDoctors) { doctor ->
-                        DoctorCard(doctor)
+                        DoctorCardWithFavorite(
+                            doctor = doctor,
+                            isFavorite = favoriteIds.contains(doctor.id),
+                            onFavoriteToggle = {
+                                favoriteViewModel.toggleFavorite(doctor)
+                            }
+                        )
                     }
                 }
             }
@@ -450,47 +539,10 @@ fun BottomNavigationBar(navController: NavHostController, currentRoute: String) 
 }
 
 
-
 @Composable
-fun DoctorCard(doctor: Doctor) {
-    val ctx = LocalContext.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        elevation = CardDefaults.cardElevation(6.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Row(
-            Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(ctx)
-                    .data(doctor.imageUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = doctor.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(doctor.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text(doctor.speciality, color = MaterialTheme.colorScheme.primary)
-                Text("🏥 ${doctor.hospital}", fontSize = 13.sp)
-                Text("📍 ${doctor.location}", fontSize = 13.sp)
-                Text("⭐ ${doctor.rating} (${doctor.reviews} reviews)", fontSize = 13.sp)
-            }
-        }
-    }
-}
-@Composable
-fun MainApp() {
+fun MainApp(
+    favoriteViewModel: FavoriteViewModel = viewModel()
+) {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route ?: "home"
 
@@ -506,24 +558,61 @@ fun MainApp() {
             startDestination = "home",
             modifier = Modifier.padding(padding)
         ) {
+
+            // 🏠 Home screen
             composable("home") {
+                val doctorViewModel: DoctorViewModel = viewModel()
+
                 HomeScreen(
-                    viewModel = viewModel(),
-                    onSearchClick = { navController.navigate("search") }
+                    viewModel = doctorViewModel,
+                    favoriteViewModel = favoriteViewModel,
+                    onSearchClick = { navController.navigate("search") },
+                    onFavoriteClick = { navController.navigate("favorites") } // 🔹 Tugma orqali favorites sahifasiga o‘tadi
                 )
             }
+
+            // 🔍 Search screen
             composable("search") {
+                val doctorViewModel: DoctorViewModel = viewModel()
+
                 SearchScreen(
-                    viewModel = viewModel(),
+                    viewModel = doctorViewModel,
+                    favoriteViewModel = favoriteViewModel,
                     onBack = { navController.popBackStack() }
                 )
             }
-            composable("appointments") { Text("Appointments Screen", color = Color.Black) }
-            composable("history") { Text("History Screen", color = Color.Black) }
-            composable("articles") { Text("Articles Screen", color = Color.Black) }
-            composable("profile") { Text("Profile Screen", color = Color.Black) }
+
+            // ❤️ Favorite Doctor screen
+            composable("favorites") {
+                FavoriteDoctorScreen(
+                    viewModel = favoriteViewModel,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
+            // 📅 Appointments
+            composable("appointments") {
+                Text("Appointments Screen", color = Color.Black)
+            }
+
+            // 📖 History
+            composable("history") {
+                Text("History Screen", color = Color.Black)
+            }
+
+            // 📰 Articles
+            composable("articles") {
+                Text("Articles Screen", color = Color.Black)
+            }
+
+            // 👤 Profile
+            composable("profile") {
+                Text("Profile Screen", color = Color.Black)
+            }
         }
     }
 }
+
+
 
 
