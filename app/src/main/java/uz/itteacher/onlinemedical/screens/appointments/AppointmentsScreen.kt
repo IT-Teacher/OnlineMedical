@@ -1,3 +1,4 @@
+// AppointmentsScreen.kt
 package uz.itteacher.onlinemedical.screens.appointments
 
 import androidx.compose.foundation.layout.*
@@ -10,32 +11,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import uz.itteacher.onlinemedical.R
-import uz.itteacher.onlinemedical.model.*
+import uz.itteacher.onlinemedical.model.AppointmentViewModel
 
 @Composable
-fun AppointmentsScreen() {
+fun AppointmentsScreen(navController: NavHostController) {
+    val viewModel: AppointmentViewModel = viewModel()
+    val appointments = viewModel.appointments
+
     var selectedTab by remember { mutableStateOf(0) }
 
-    val allAppointments = listOf(
-        Appointment("Raul Zirkind", "Voice Call", "Dec 12, 2022", "16:00 PM",
-            AppointmentStatus.CANCELLED, R.drawable.ic_launcher_foreground),
-        Appointment("Aidan Allende", "Video Call", "Dec 14, 2022", "15:00 PM",
-            AppointmentStatus.COMPLETED, R.drawable.ic_launcher_foreground),
-        Appointment("Drake Boeson", "Messaging", "Today", "16:00 PM",
-            AppointmentStatus.UPCOMING, R.drawable.ic_launcher_foreground),
-    )
-
-    val filteredAppointments = when (selectedTab) {
-        0 -> allAppointments.filter { it.status == AppointmentStatus.UPCOMING }
-        1 -> allAppointments.filter { it.status == AppointmentStatus.COMPLETED }
-        else -> allAppointments.filter { it.status == AppointmentStatus.CANCELLED }
+    val filteredAppointments = remember(appointments, selectedTab) {
+        when (selectedTab) {
+            0 -> appointments.filter { it.status == "UPCOMING" }
+            1 -> appointments.filter { it.status == "COMPLETED" }
+            else -> appointments.filter { it.status == "CANCELLED" }
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         AppointmentTopBar(
-            onSearchClick = { /* TODO: handle search */ },
-            onMoreClick = { /* TODO: handle menu */ }
+            onSearchClick = { /* TODO */ },
+            onMoreClick = { /* TODO */ }
         )
 
         AppointmentTabs(onTabSelected = { selectedTab = it })
@@ -45,12 +44,10 @@ fun AppointmentsScreen() {
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(filteredAppointments) { appointment ->
-                    if (selectedTab == 1) {
-                        CompletedAppointmentCard(appointment)
-                    } else if (selectedTab == 0) {
-                        AppointmentCard(appointment)
-                    } else {
-                        CanceledAppointmentCard(appointment)
+                    when (selectedTab) {
+                        0 -> AppointmentCard(appointment, navController)
+                        1 -> CompletedAppointmentCard(appointment, navController)
+                        else -> CanceledAppointmentCard(appointment, navController)
                     }
                 }
             }

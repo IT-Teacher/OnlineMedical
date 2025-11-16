@@ -1,27 +1,31 @@
+// AppointmentCard.kt
 package uz.itteacher.onlinemedical.screens.appointments
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import uz.itteacher.onlinemedical.R
-import uz.itteacher.onlinemedical.model.Appointment
+import uz.itteacher.onlinemedical.model.AppointmentData
 
 @Composable
-fun AppointmentCard(appointment: Appointment) {
+fun AppointmentCard(appointment: AppointmentData, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -35,32 +39,35 @@ fun AppointmentCard(appointment: Appointment) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // First Row: Image, Text Column, and Messaging Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    painter = rememberAsyncImagePainter(
+                        model = appointment.doctorPhotoUrl,
+                        placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                        error = painterResource(R.drawable.ic_launcher_foreground)
+                    ),
+                    contentDescription = "Doctor",
                     modifier = Modifier
                         .size(60.dp)
-                        .background(Color.LightGray, shape = CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Dr. Drake Boeson",
+                        text = appointment.doctorName,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         maxLines = 1
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Messaging     -     ",
+                            text = "${appointment.packageType}     -     ",
                             color = Color.DarkGray,
                             fontSize = 14.sp,
                             maxLines = 1
@@ -80,11 +87,16 @@ fun AppointmentCard(appointment: Appointment) {
                         Image(
                             painter = painterResource(id = R.drawable.message),
                             contentDescription = "Message",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("appointment", appointment)
+                                    navController.navigate("messaging_appointment")
+                                }
                         )
                     }
                     Text(
-                        text = "Today | 16:00 PM",
+                        text = "${appointment.date} | ${appointment.time.split(" – ")[0]}",
                         color = Color.DarkGray,
                         fontSize = 13.sp,
                         maxLines = 1
@@ -92,7 +104,6 @@ fun AppointmentCard(appointment: Appointment) {
                 }
             }
 
-            // Second Row: Buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,7 +113,7 @@ fun AppointmentCard(appointment: Appointment) {
                 Button(
                     border = BorderStroke(1.dp, Color(0xFF007BFF)),
                     onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF).copy(alpha = 0.0f), contentColor = Color(0xFF007BFF)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color(0xFF007BFF)),
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
                         .padding(end = 8.dp)
@@ -125,8 +136,9 @@ fun AppointmentCard(appointment: Appointment) {
         }
     }
 }
+
 @Composable
-fun CompletedAppointmentCard(appointment: Appointment) {
+fun CompletedAppointmentCard(appointment: AppointmentData, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,43 +152,43 @@ fun CompletedAppointmentCard(appointment: Appointment) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // First Row: Image, Text Column, and Messaging Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    painter = rememberAsyncImagePainter(
+                        model = appointment.doctorPhotoUrl,
+                        placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                        error = painterResource(R.drawable.ic_launcher_foreground)
+                    ),
+                    contentDescription = "Doctor",
                     modifier = Modifier
                         .size(60.dp)
-                        .background(Color.LightGray, shape = CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Dr. Drake Boeson",
+                        text = appointment.doctorName,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         maxLines = 1
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Messaging     -     ",
+                            text = "${appointment.packageType}     -     ",
                             color = Color.DarkGray,
                             fontSize = 14.sp,
                             maxLines = 1
                         )
                         Button(
-                            border = BorderStroke(1.dp, Color(0xFF37FF00)),
+                            border = BorderStroke(1.dp, Color(0xFF28A745)),
                             onClick = {},
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF37FF00).copy(alpha = 0f), contentColor = Color(
-                                0xFF37FF00
-                            )
-                            ),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color(0xFF28A745)),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .height(36.dp)
@@ -186,13 +198,21 @@ fun CompletedAppointmentCard(appointment: Appointment) {
                         }
                         Spacer(modifier = Modifier.width(20.dp))
                         Image(
-                            painter = painterResource(id = R.drawable.camera),
+                            painter = painterResource(id = R.drawable.message),
                             contentDescription = "Message",
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("appointment", appointment)
+                                    navController.navigate("messaging_appointment") {
+                                        popUpTo(navController.graph.startDestinationId)
+                                        launchSingleTop = true
+                                    }
+                                }
                         )
                     }
                     Text(
-                        text = "Today | 16:00 PM",
+                        text = "${appointment.date} | ${appointment.time.split(" – ")[0]}",
                         color = Color.DarkGray,
                         fontSize = 13.sp,
                         maxLines = 1
@@ -200,7 +220,6 @@ fun CompletedAppointmentCard(appointment: Appointment) {
                 }
             }
 
-            // Second Row: Buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -210,7 +229,7 @@ fun CompletedAppointmentCard(appointment: Appointment) {
                 Button(
                     border = BorderStroke(1.dp, Color(0xFF007BFF)),
                     onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF).copy(alpha = 0.0f), contentColor = Color(0xFF007BFF)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color(0xFF007BFF)),
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
                         .padding(end = 8.dp)
@@ -233,8 +252,9 @@ fun CompletedAppointmentCard(appointment: Appointment) {
         }
     }
 }
+
 @Composable
-fun CanceledAppointmentCard(appointment: Appointment) {
+fun CanceledAppointmentCard(appointment: AppointmentData, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -248,32 +268,35 @@ fun CanceledAppointmentCard(appointment: Appointment) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // First Row: Image, Text Column, and Messaging Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    painter = rememberAsyncImagePainter(
+                        model = appointment.doctorPhotoUrl,
+                        placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                        error = painterResource(R.drawable.ic_launcher_foreground)
+                    ),
+                    contentDescription = "Doctor",
                     modifier = Modifier
                         .size(60.dp)
-                        .background(Color.LightGray, shape = CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Dr. Drake Boeson",
+                        text = appointment.doctorName,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         maxLines = 1
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Messaging     -     ",
+                            text = "${appointment.packageType}     -     ",
                             color = Color.DarkGray,
                             fontSize = 14.sp,
                             maxLines = 1
@@ -281,10 +304,7 @@ fun CanceledAppointmentCard(appointment: Appointment) {
                         Button(
                             border = BorderStroke(1.dp, Color(0xFFFF0000)),
                             onClick = {},
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF0000).copy(alpha = 0f), contentColor = Color(
-                                0xFFFF0000
-                            )
-                            ),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color(0xFFFF0000)),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .height(36.dp)
@@ -295,12 +315,12 @@ fun CanceledAppointmentCard(appointment: Appointment) {
                         Spacer(modifier = Modifier.width(20.dp))
                         Image(
                             painter = painterResource(id = R.drawable.call),
-                            contentDescription = "Message",
+                            contentDescription = "Call",
                             modifier = Modifier.size(20.dp)
                         )
                     }
                     Text(
-                        text = "Today | 16:00 PM",
+                        text = "${appointment.date} | ${appointment.time.split(" – ")[0]}",
                         color = Color.DarkGray,
                         fontSize = 13.sp,
                         maxLines = 1

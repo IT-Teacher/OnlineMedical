@@ -1,3 +1,4 @@
+// AppointmentTabs.kt
 package uz.itteacher.onlinemedical.screens.appointments
 
 import androidx.compose.foundation.layout.*
